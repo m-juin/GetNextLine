@@ -1,0 +1,6 @@
+*.a
+*.o
+*.so
+*.out
+*.swp
+libft-unit-test/
