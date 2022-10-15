@@ -5,111 +5,131 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/12 21:56:21 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/14 13:34:08 by mjuin            ###   ########.fr       */
+/*   Created: 2022/10/15 18:01:22 by mjuin             #+#    #+#             */
+/*   Updated: 2022/10/15 19:59:08 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdlib.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
 
-static void	ft_putstr(char *str)
+static char *ft_calloc(int size)
+{
+	char	*ret;
+	int		pos;
+
+	pos = 0;
+	ret = malloc(size * sizeof(char));
+	if (!ret)
+		return (NULL);
+	while (pos < size)
+	{
+		ret[pos] = '\0';
+		pos++;
+	}
+	return (ret);
+}
+
+static char	*ft_strjoin(char *s1, char *buf)
+{
+	int		s1pos;
+	int		bufpos;
+	int		pos;
+	char	*ret;
+
+	pos = 0;
+	bufpos = 0;
+	s1pos = 0;
+	while (buf[bufpos] != '\n' && buf[bufpos])
+		bufpos++;
+	while (s1[s1pos])
+		s1pos++;
+	ret = ft_calloc(((bufpos + s1pos + 2)) * sizeof(char));
+	if(!ret)
+		return (NULL);
+	while (pos < bufpos + s1pos + 1)
+	{
+		if (pos < s1pos)
+			ret[pos] = s1[pos];
+		else
+			ret[pos] = buf[pos - s1pos];
+		pos++;
+	}
+	return (ret);
+}
+
+static int	ft_verifyline(char	*str)
 {
 	int	pos;
 
 	pos = 0;
 	while (str[pos])
 	{
-		write(1, &str[pos], 1);
+		if (str[pos] == '\n')
+			return (0);
 		pos++;
 	}
+	return (1);
 }
 
-static char	*ft_copy(char *src, int size)
+static void ft_movebuf(char *buf)
 {
-	char	*dst;
-	int		pos;
-	int		srcpos;
+	int	len;
+	int	nlpos;
+	int	pos;
 
-	dst = malloc((size + 1) * sizeof(char));
+	len = 0;
+	nlpos = 0;
 	pos = 0;
-	if (!dst)
-		return (NULL);
-	while (pos < size)
+	while (buf[len])
+		len++;
+	while (buf[nlpos] && buf[nlpos] != '\n')
+		nlpos++;
+	while (nlpos == len && buf[pos])
 	{
-		srcpos = 0;
-		dst[pos] = src[srcpos];
-		while (src[srcpos])
-		{
-			src[srcpos] = src[srcpos + 1];
-			srcpos++;
-		}
+		buf[pos] = '\0';
 		pos++;
 	}
-	dst[pos] = '\0';
-	return (dst);
+	pos = 0;
+	while (buf[pos + nlpos + 1])
+	{
+		buf[pos] = buf[pos + nlpos + 1];
+		pos++;
+	}
+	buf[pos] = '\0';
 }
 
 char	*get_next_line(int fd)
 {
-	static char	buffer[1024][BUFFER_SIZE];
-	char		*printed;
-	int			pos;
+	static char buffer[1024][BUFFER_SIZE];
+	char		*ret;
 	int			readvalue;
 
-	pos = 0;
-	while (buffer[fd][pos] != '\n' && buffer[fd][pos] != '\0')
-		pos++;
-	if (pos > 0 && buffer[fd][pos] == '\n')
+	readvalue = -1;
+	if (fd < 0 || fd > 1024)
+		return (NULL);
+	if (!buffer[fd] || buffer[fd][0] == '\0')
+		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
+	if (readvalue == 0)
+		return (NULL);
+	ret = ft_strjoin("", buffer[fd]);
+	if(!ret)
+		return (NULL);
+	while (readvalue != 0 && ft_verifyline(buffer[fd]) != 0)
 	{
-		printed = ft_copy(buffer[fd], pos + 1);
-		if (!printed)
-			return (NULL);
-	}
-	else
-	{
-		if (pos != 0 && buffer[fd][pos] == '\0')
-			ft_putstr(buffer[fd]);
-		pos = 0;
 		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
 		if (readvalue == 0)
-			return (NULL);
-		while (buffer[fd][pos] != '\n' && buffer[fd][pos] != '\0')
-			pos++;
-		if (pos > 0 && buffer[fd][pos] == '\n')
 		{
-			printed = ft_copy(buffer[fd], pos + 1);
-			if (!printed)
-				return (NULL);
+			free(ret);
+			return (NULL);
 		}
+		ret = ft_strjoin(ret, buffer[fd]);
+		if (!ret)
+			return (NULL);
 	}
-	return (printed);
-}
-
-int	main(void)
-{
-	int	fd;
-	int	fd1;
-
-	fd = open("42", O_RDONLY);
-	if(fd == -1)
-	{
-		ft_putstr("open() error");
-		return (0);
-	}
-	fd1 = open("43", O_RDONLY);
-	if(fd1 == -1)
-	{
-		ft_putstr("open() error");
-		return (0);
-	}
-	ft_putstr(get_next_line(fd));
-	ft_putstr(get_next_line(fd1));
-	ft_putstr(get_next_line(fd));
-	close(fd);
-	close(fd1);
-	return (0);
+	ft_movebuf(buffer[fd]);
+	return (ret);
 }
