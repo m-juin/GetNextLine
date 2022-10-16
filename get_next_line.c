@@ -6,7 +6,7 @@
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/15 18:01:22 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/15 19:59:08 by mjuin            ###   ########.fr       */
+/*   Updated: 2022/10/16 14:41:09 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,10 @@ static char *ft_calloc(int size)
 	int		pos;
 
 	pos = 0;
-	ret = malloc(size * sizeof(char));
+	ret = malloc((size + 1) * sizeof(char));
 	if (!ret)
 		return (NULL);
-	while (pos < size)
+	while (pos <= size)
 	{
 		ret[pos] = '\0';
 		pos++;
@@ -45,12 +45,13 @@ static char	*ft_strjoin(char *s1, char *buf)
 	s1pos = 0;
 	while (buf[bufpos] != '\n' && buf[bufpos])
 		bufpos++;
+	bufpos++;
 	while (s1[s1pos])
 		s1pos++;
-	ret = ft_calloc(((bufpos + s1pos + 2)) * sizeof(char));
+	ret = ft_calloc(((bufpos + s1pos)) * sizeof(char));
 	if(!ret)
 		return (NULL);
-	while (pos < bufpos + s1pos + 1)
+	while (pos < bufpos + s1pos)
 	{
 		if (pos < s1pos)
 			ret[pos] = s1[pos];
@@ -109,23 +110,15 @@ char	*get_next_line(int fd)
 	int			readvalue;
 
 	readvalue = -1;
-	if (fd < 0 || fd > 1024)
+	if (fd < 0 || fd > 999)
 		return (NULL);
 	if (!buffer[fd] || buffer[fd][0] == '\0')
 		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
-	if (readvalue == 0)
-		return (NULL);
-	ret = ft_strjoin("", buffer[fd]);
-	if(!ret)
+	if (readvalue <= 0)
 		return (NULL);
 	while (readvalue != 0 && ft_verifyline(buffer[fd]) != 0)
 	{
 		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
-		if (readvalue == 0)
-		{
-			free(ret);
-			return (NULL);
-		}
 		ret = ft_strjoin(ret, buffer[fd]);
 		if (!ret)
 			return (NULL);

@@ -6,7 +6,7 @@
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/15 19:08:03 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/15 20:05:09 by mjuin            ###   ########.fr       */
+/*   Updated: 2022/10/16 14:20:30 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ char	*get_next_line(int fd);
 int	main(int ac, char **av)
 {
 	ac = ac;
-	av =av;
-	int fd = open("41b", O_RDONLY);
+	av = av;
+	int fd = open("files/nl", O_RDONLY);
 	if (fd == -1)
 		printf("Error\n");
 	printf("%s", get_next_line(fd));

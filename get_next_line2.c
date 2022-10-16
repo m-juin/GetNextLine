@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line2.c                                   :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 21:56:21 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/15 17:58:32 by mjuin            ###   ########.fr       */
+/*   Updated: 2022/10/16 14:14:50 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-/*static void	ft_putstr(char *str)
-{
-	int	pos;
-
-	pos = 0;
-	while (str[pos])
-	{
-		write(1, &str[pos], 1);
-		pos++;
-	}
-}*/
 
 static int	ft_checkendline(char *str)
 {
@@ -141,26 +129,3 @@ char	*get_next_line(int fd)
 		return (NULL);
 	return (printed);
 }
-
-/*int	main(void)
-{
-	int	fd;
-	int	fd1;
-
-	fd = open("42", O_RDONLY);
-	if(fd == -1)
-	{
-		ft_putstr("open() error");
-		return (0);
-	}
-	fd1 = open("43", O_RDONLY);
-	if(fd1 == -1)
-	{
-		ft_putstr("open() error");
-		return (0);
-	}
-	ft_putstr(get_next_line(fd));
-	close(fd);
-	close(fd1);
-	return (0);
-}*/
