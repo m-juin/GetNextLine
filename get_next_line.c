@@ -11,118 +11,258 @@
 /* ************************************************************************** */
 
 #include <stdlib.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
-static char *ft_calloc(int size)
+/*static int	ft_findnewline(char *buf)
 {
-	char	*ret;
-	int		pos;
+	int	pos;
 
 	pos = 0;
-	ret = malloc((size + 1) * sizeof(char));
-	if (!ret)
-		return (NULL);
-	while (pos <= size)
+	while (buf[pos])
 	{
-		ret[pos] = '\0';
+		if (buf[pos] == '\n')
+			return (pos);
 		pos++;
 	}
-	return (ret);
+	return (-1);
+}*/
+
+/*static int	ft_strlen(char *str, int boolean)
+{
+	int	size;
+
+	size = 0;
+	if(!str)
+		return (0);
+	if (boolean == 0)
+		while(str[size])
+			size++;
+	else
+	{
+		while (str[size] && str[size] != '\n')
+			size++;
+		if(str[size] == '\n')
+			size++;
+	}
+	return (size);
 }
 
-static char	*ft_strjoin(char *s1, char *buf)
+static char	*ft_join(char *s1, char *s2)
 {
-	int		s1pos;
-	int		bufpos;
+	int 	ss1;
+	int		ss2;
 	int		pos;
-	char	*ret;
+	char 	*tmp;
 
-	pos = 0;
-	bufpos = 0;
-	s1pos = 0;
-	while (buf[bufpos] != '\n' && buf[bufpos])
-		bufpos++;
-	bufpos++;
-	while (s1[s1pos])
-		s1pos++;
-	ret = ft_calloc(((bufpos + s1pos)) * sizeof(char));
-	if(!ret)
+	ss1 = ft_strlen(s1, 1); 
+	ss2 = ft_strlen(s2, 1);	
+	tmp = malloc((ss1 + ss2 + 1) * sizeof(char));
+	if(!tmp)
 		return (NULL);
-	while (pos < bufpos + s1pos)
+	pos = 0;
+	while (pos < ss1 + ss2)
 	{
-		if (pos < s1pos)
-			ret[pos] = s1[pos];
+		if (pos < ss1)
+			tmp[pos] = tmp[pos];
 		else
-			ret[pos] = buf[pos - s1pos];
+			tmp[pos] = s2[pos - ss1];
 		pos++;
 	}
-	return (ret);
+	free(s1);
+	tmp[pos] = 0;
+	return (tmp);
 }
 
-static int	ft_verifyline(char	*str)
+char	*ft_movebuf(char *buf)
 {
-	int	pos;
+	int 	value;
+	int		fullsize;
+	int		pos;
+	char	*ret;
 
+	value = ft_strlen(buf, 1);
+	ret = malloc((value + 1) * sizeof(char));
+	if(!ret)
+		return(NULL);
+	fullsize = ft_strlen(buf, 0);
 	pos = 0;
-	while (str[pos])
+	while (buf[pos])
 	{
-		if (str[pos] == '\n')
-			return (0);
-		pos++;
-	}
-	return (1);
-}
-
-static void ft_movebuf(char *buf)
-{
-	int	len;
-	int	nlpos;
-	int	pos;
-
-	len = 0;
-	nlpos = 0;
-	pos = 0;
-	while (buf[len])
-		len++;
-	while (buf[nlpos] && buf[nlpos] != '\n')
-		nlpos++;
-	while (nlpos == len && buf[pos])
-	{
-		buf[pos] = '\0';
-		pos++;
-	}
-	pos = 0;
-	while (buf[pos + nlpos + 1])
-	{
-		buf[pos] = buf[pos + nlpos + 1];
+		if (pos < value)
+			ret[pos] = buf[pos];
+		if (pos + value < fullsize)
+			buf[pos] = buf[pos + value];
+		else
+			buf[pos] = '\0';
 		pos++;
 	}
 	buf[pos] = '\0';
+	return (ret);
 }
 
-char	*get_next_line(int fd)
+char *ft_boucle(char *buf, int fd)
 {
-	static char buffer[1024][BUFFER_SIZE];
-	char		*ret;
-	int			readvalue;
+	int	readvalue;
+	char	*tmp;
+	char	*ret;
 
 	readvalue = -1;
-	if (fd < 0 || fd > 999)
-		return (NULL);
-	if (!buffer[fd] || buffer[fd][0] == '\0')
-		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
-	if (readvalue <= 0)
-		return (NULL);
-	while (readvalue != 0 && ft_verifyline(buffer[fd]) != 0)
+	ret = NULL;
+	while (readvalue != 0)
 	{
-		readvalue = read(fd, buffer[fd], BUFFER_SIZE);
-		ret = ft_strjoin(ret, buffer[fd]);
-		if (!ret)
-			return (NULL);
+		tmp = NULL;
+		tmp = ft_movebuf(buf);
+		if(!tmp)
+			return(NULL);
+		ret = ft_join(ret, tmp);
+		free(tmp);
+		if(!ret)
+			return(NULL);
+		if(buf[0] != '\0')
+			break ;
+		readvalue = read(fd, buf, BUFFER_SIZE);
 	}
-	ft_movebuf(buffer[fd]);
 	return (ret);
+}*/
+
+int	ft_getline(char *src)
+{
+	int pos;
+
+	pos = 0;
+	while (src[pos])
+	{
+		if(src[pos] == '\n')
+			return (pos + 1);
+		pos++;
+	}
+	return (-1);
+}
+static int ft_strlen(char *str)
+{
+	int pos;
+
+	pos = 0;
+	while (str[pos])
+		pos++;
+	return (pos);
+	
+}
+
+char	*ft_copy(char *dst, char *src)
+{
+	char	*tmp;
+	int		dstpos;
+	int		srcpos;
+	int		globalpos;
+
+	if (!dst || !src)
+		return (NULL);
+	dstpos = ft_strlen(dst);
+	srcpos = ft_strlen(src);
+	tmp = malloc((dstpos + srcpos + 1) * sizeof(char));
+	if (!tmp)
+		return(NULL);
+	globalpos = 0;
+	while (globalpos < dstpos + srcpos)
+	{
+		if (globalpos < srcpos)
+			tmp[globalpos] = src[globalpos];
+		else
+			tmp[globalpos] = src[globalpos - srcpos];
+		globalpos++;
+	}
+	tmp[globalpos] = '\0';
+	free(dst);
+	return (tmp);
+}
+
+char	*ft_read(int fd, char *ret)
+{
+	char	*buffer;
+	int		readvalue;
+
+	readvalue = 1;
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
+		return (NULL);
+	buffer[0] = '\0';
+	while (readvalue > 0 && ft_getline(buffer) == -1)
+	{
+		readvalue = read(fd, buffer, BUFFER_SIZE);
+		buffer[readvalue] = '\0';
+		ret = ft_copy(ret, buffer);
+	}
+	free(buffer);
+	return (ret);
+}
+
+char	*ft_getdisplayedline(char *buffer)
+{
+	char	*ret;
+	int		nlpos;
+
+	if (!buffer[0])
+		return (NULL);
+	nlpos = 0;
+	while (buffer[nlpos] && buffer[nlpos] != '\n')
+		nlpos++;
+	ret = malloc((nlpos + 1) * sizeof(char));
+	if (!ret)
+		return (NULL);
+	nlpos = 0;
+	while (buffer[nlpos] && buffer[nlpos] != '\n')
+	{
+		ret[nlpos] = buffer[nlpos];
+		nlpos++;
+	}
+	if (buffer[nlpos] == '\n')
+		ret[nlpos] = '\n';
+	return (ret);
+}
+
+char	*ft_updatebuffer(char *buffer)
+{
+	int		nlpos;
+	int		bufsize;
+	int		pos;
+	char    *ret;
+
+	nlpos = 0;
+	if(!buffer)
+		return (NULL);
+	bufsize = ft_strlen(buffer);
+	while (buffer[nlpos] && buffer[nlpos] != '\n')
+		nlpos++;
+	ret = malloc(((bufsize - nlpos + 1)) * sizeof(char));
+	if (!ret)
+		return (NULL);
+	pos = 0;
+	while (nlpos + pos < bufsize)
+	{
+		ret[pos] = buffer[nlpos + pos];
+		pos++;
+	}
+	ret[pos] = '\0';
+	free(buffer);
+	return (ret);
+}
+char	*get_next_line(int fd)
+{
+	static char *buffer;
+	char	*line;
+
+	if(read(fd,0,0) < 0 || BUFFER_SIZE < 0)
+		return (NULL);
+	if (!buffer)
+	{
+		buffer = malloc(1);
+		if (!buffer)
+			return (NULL);
+		buffer[0] = '\0';
+	}
+	buffer = ft_read(fd, buffer);
+	line = ft_getdisplayedline(buffer);
+	buffer = ft_updatebuffer(buffer);
+	return (line);
 }

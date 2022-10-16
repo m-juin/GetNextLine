@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 char	*get_next_line(int fd);
 
@@ -22,10 +23,12 @@ int	main(int ac, char **av)
 {
 	ac = ac;
 	av = av;
+	char * str;
 	int fd = open("files/nl", O_RDONLY);
 	if (fd == -1)
 		printf("Error\n");
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
+	str = get_next_line(fd);
+	printf("%s", str);
+	free(str);
 	close(fd);
 }
