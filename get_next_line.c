@@ -207,7 +207,7 @@ char	*ft_getdisplayedline(char *buffer)
 	nlpos = 0;
 	while (buffer[nlpos] && buffer[nlpos] != '\n')
 		nlpos++;
-	ret = malloc((nlpos + 1) * sizeof(char));
+	ret = malloc((nlpos + 2) * sizeof(char));
 	if (!ret)
 		return (NULL);
 	nlpos = 0;
@@ -218,6 +218,7 @@ char	*ft_getdisplayedline(char *buffer)
 	}
 	if (buffer[nlpos] == '\n')
 		ret[nlpos] = '\n';
+	ret[nlpos + 1] = '\0';
 	return (ret);
 }
 
