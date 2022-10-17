@@ -1,16 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/15 18:01:22 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/17 11:30:45 by mjuin            ###   ########.fr       */
+/*   Updated: 2022/10/17 11:34:13 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include "get_next_line_bonus.h"
 
 static int	ft_getline(char *src)
 {
@@ -105,19 +107,19 @@ static char	*ft_updatebuffer(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[1024];
 	char		*line;
 
 	if (read(fd, 0, 0) < 0 || BUFFER_SIZE < 0)
 		return (NULL);
-	if (!buffer)
+	if (!buffer[fd])
 	{
-		buffer = ft_calloc(1);
-		if (!buffer)
+		buffer[fd] = ft_calloc(1);
+		if (!buffer[fd])
 			return (NULL);
 	}
-	buffer = ft_read(fd, buffer);
-	line = ft_getdisplayedline(buffer);
-	buffer = ft_updatebuffer(buffer);
+	buffer[fd] = ft_read(fd, buffer[fd]);
+	line = ft_getdisplayedline(buffer[fd]);
+	buffer[fd] = ft_updatebuffer(buffer[fd]);
 	return (line);
 }
