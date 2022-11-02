@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
 #include "get_next_line_bonus.h"
 
 static int	ft_getline(char *src)
@@ -37,15 +35,20 @@ static char	*ft_read(int fd, char *ret)
 
 	readvalue = 1;
 	buffer = ft_calloc((BUFFER_SIZE + 1));
-	if (!buffer)
-		return (NULL);
-	while (readvalue > 0 && ft_getline(buffer) == -1)
+	while (readvalue > 0 && buffer != NULL && ft_getline(buffer) == -1)
 	{
 		readvalue = read(fd, buffer, BUFFER_SIZE);
+		if (readvalue == -1)
+		{
+			free(buffer);
+			free(ret);
+			return (NULL);
+		}
 		buffer[readvalue] = '\0';
 		ret = ft_copy(ret, buffer);
 	}
-	free(buffer);
+	if (buffer != NULL)
+		free(buffer);
 	if (ret[0] == '\0')
 	{
 		free(ret);
@@ -110,7 +113,7 @@ char	*get_next_line(int fd)
 	static char	*buffer[1024];
 	char		*line;
 
-	if (read(fd, 0, 0) < 0 || BUFFER_SIZE < 0)
+	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
 	if (!buffer[fd])
 	{
@@ -119,6 +122,8 @@ char	*get_next_line(int fd)
 			return (NULL);
 	}
 	buffer[fd] = ft_read(fd, buffer[fd]);
+	if (buffer[fd] == NULL)
+		return (NULL);
 	line = ft_getdisplayedline(buffer[fd]);
 	buffer[fd] = ft_updatebuffer(buffer[fd]);
 	return (line);

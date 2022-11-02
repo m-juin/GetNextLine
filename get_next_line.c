@@ -6,7 +6,7 @@
 /*   By: mjuin <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/15 18:01:22 by mjuin             #+#    #+#             */
-/*   Updated: 2022/10/17 11:30:45 by mjuin            ###   ########.fr       */
+/*   Updated: 2022/10/24 15:19:23 by mjuin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,20 @@ static char	*ft_read(int fd, char *ret)
 
 	readvalue = 1;
 	buffer = ft_calloc((BUFFER_SIZE + 1));
-	if (!buffer)
-		return (NULL);
-	while (readvalue > 0 && ft_getline(buffer) == -1)
+	while (readvalue > 0 && buffer != NULL && ft_getline(buffer) == -1)
 	{
 		readvalue = read(fd, buffer, BUFFER_SIZE);
+		if (readvalue == -1)
+		{
+			free(buffer);
+			free(ret);
+			return (NULL);
+		}
 		buffer[readvalue] = '\0';
 		ret = ft_copy(ret, buffer);
 	}
-	free(buffer);
+	if (buffer != NULL)
+		free(buffer);
 	if (ret[0] == '\0')
 	{
 		free(ret);
@@ -108,7 +113,7 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*line;
 
-	if (read(fd, 0, 0) < 0 || BUFFER_SIZE < 0)
+	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
 	if (!buffer)
 	{
@@ -117,6 +122,8 @@ char	*get_next_line(int fd)
 			return (NULL);
 	}
 	buffer = ft_read(fd, buffer);
+	if (buffer == NULL)
+		return (NULL);
 	line = ft_getdisplayedline(buffer);
 	buffer = ft_updatebuffer(buffer);
 	return (line);
