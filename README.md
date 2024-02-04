@@ -4,7 +4,7 @@
 # Project
 Get Next Line is one of the three project in the 42 program second circle. It aims to introduce the students to 2 new concept of C language, the ***File Descriptor*** and the ***static variable*** by creating a function to read line by line a file.
 
-# Contraint
+# Constraints
 According to the subject there is 3 contraints for this project:
 *  The global variables are prohibited.
 *  The *lseek* function is forbidden.
